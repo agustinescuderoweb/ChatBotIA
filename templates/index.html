@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <h1>Chat con documento</h1>
+  <div id="chat"></div>
+  <div id="input-area">
+    <input type="text" id="input" placeholder="Escribí tu pregunta..." size="50" />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <script>
+    document.body.style.backgroundColor = 'lightyellow';
+    console.log("Script funcionando");
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+
+    function appendMessage(text, sender) {
+      const div = document.createElement('div');
+      div.className = 'message ' + sender;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function sendMessage() {
+      const msg = input.value.trim();
+      if (!msg) return;
+      appendMessage("Tú: " + msg, "user");
+      input.value = "";
+      fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      })
+      .then(res => res.json())
+      .then(data => {
+        appendMessage("Bot: " + data.reply, "bot");
+      })
+      .catch(() => {
+        appendMessage("Bot: Error al conectar con el servidor.", "bot");
+      });
+    }
+
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
