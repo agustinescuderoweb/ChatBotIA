@@ -158,15 +158,21 @@ def chat():
         try:
             update_index()
         except Exception as e:
-            return jsonify({"reply": f"Error al actualizar el documento: {str(e)}"})
+            response = jsonify({"reply": f"Error al actualizar el documento: {str(e)}"})
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
 
     data = request.get_json()
     pregunta = data.get("message", "")
+
     try:
         respuesta = ask_question_with_context(pregunta, index, chunks)
-        return jsonify({"reply": respuesta})
+        response = jsonify({"reply": respuesta})
     except Exception as e:
-        return jsonify({"reply": f"Error: {str(e)}"})
+        response = jsonify({"reply": f"Error: {str(e)}"})
+
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 if __name__ == "__main__":
     print("Iniciando servidor...")
