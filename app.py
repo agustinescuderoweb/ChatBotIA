@@ -39,7 +39,7 @@ def add_cors_headers(response):
 # Función para extraer texto desde Google Docs
 def extract_text_from_gdoc(document_id):
     SCOPES = ['https://www.googleapis.com/auth/documents.readonly']
-    SERVICE_ACCOUNT_FILE = 'credentials.json'  # Tu archivo de credenciales JSON
+    SERVICE_ACCOUNT_FILE = 'CREDENTIALS_JSON'  # Tu archivo de credenciales JSON
     creds = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
     service = build('docs', 'v1', credentials=creds)
