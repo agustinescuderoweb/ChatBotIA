@@ -31,7 +31,7 @@ last_update = 0
 # Función para agregar headers CORS a cada respuesta
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+    response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
     return response
@@ -147,7 +147,7 @@ def chat():
     if request.method == 'OPTIONS':
         # Respuesta para preflight CORS
         response = make_response()
-        response.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000'
+        response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
         response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
         return response
