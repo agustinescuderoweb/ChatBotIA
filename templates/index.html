@@ -31,7 +31,7 @@
       if (!msg) return;
       appendMessage("Tú: " + msg, "user");
       input.value = "";
-      fetch('https://chatbotia-vqmz.onrender.com/chat', {
+      fetch('http://127.0.0.1:5000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg })
