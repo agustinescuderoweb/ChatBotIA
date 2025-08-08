@@ -7,6 +7,8 @@ import faiss
 import numpy as np
 import tiktoken
 import time
+import tempfile
+import json
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -39,11 +41,22 @@ def add_cors_headers(response):
 # Función para extraer texto desde Google Docs
 def extract_text_from_gdoc(document_id):
     SCOPES = ['https://www.googleapis.com/auth/documents.readonly']
-    SERVICE_ACCOUNT_FILE = 'CREDENTIALS_JSON'  # Tu archivo de credenciales JSON
-    creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+    credentials_json = os.getenv("CREDENTIALS_JSON")
+    if not credentials_json:
+        raise ValueError("No se encontró la variable de entorno CREDENTIALS_JSON")
+
+    credentials_info = json.loads(credentials_json)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp:
+        json.dump(credentials_info, temp)
+        temp_path = temp.name
+
+    creds = service_account.Credentials.from_service_account_file(temp_path, scopes=SCOPES)
+
     service = build('docs', 'v1', credentials=creds)
     doc = service.documents().get(documentId=document_id).execute()
+
     text = ""
     for element in doc.get('body', {}).get('content', []):
         paragraph = element.get('paragraph')
@@ -52,6 +65,13 @@ def extract_text_from_gdoc(document_id):
                 text_run = el.get('textRun')
                 if text_run:
                     text += text_run.get('content')
+
+    # Borra el archivo temporal para no dejar basura
+    try:
+        os.remove(temp_path)
+    except Exception:
+        pass
+
     return text
 
 # Función para dividir texto en chunks por tokens
